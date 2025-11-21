@@ -1,9 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
-from typing import Optional
-from database import create_document, db
 from schemas import QuoteRequest, ContactMessage
+from database import create_document, db
 
 app = FastAPI(title="TGAgout API", version="1.0.0")
 
@@ -28,8 +26,15 @@ def test_db():
         raise HTTPException(status_code=500, detail="Database not available")
     try:
         # quick ping by listing collections
-        _ = db.list_collection_names()
-        return {"ok": True}
+        collections = db.list_collection_names()
+        return {
+            "backend": "ok",
+            "database": "ok",
+            "database_url": "configured",
+            "database_name": db.name,
+            "connection_status": "connected",
+            "collections": collections,
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
